@@ -45,7 +45,7 @@ export function SiteHeader() {
     <header className={`site-header ${scrolled || open ? 'is-scrolled' : ''}`}>
       <a href="#top" className="brand-link" aria-label="Villa Ada home">
         <Image
-          src="/branding/villa-ada-logo.jpg"
+          src={property.logo}
           alt="Villa Ada"
           width={54}
           height={54}

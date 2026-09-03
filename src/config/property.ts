@@ -1,5 +1,7 @@
 export const property = {
   name: 'Villa Ada',
+  siteUrl: 'https://villa-ada-retreat.anisbaba.chatgpt.site',
+  logo: '/branding/villa-ada-logo.jpg',
   airbnbUrl: '',
   location: {
     short: '25 minutes from Prishtina',

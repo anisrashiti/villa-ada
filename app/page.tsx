@@ -5,7 +5,6 @@ import { ReviewsSection } from '@/components/reviews-section';
 import { SiteHeader } from '@/components/site-header';
 import { property } from '@/src/config/property';
 
-const siteUrl = 'https://villa-ada-retreat.jocund-anole-9444.chatgpt.site';
 const stats = [
   { value: '10', label: 'Guests' }, { value: '2', label: 'Bedrooms' },
   { value: '1 + WC', label: 'Bathrooms' }, { value: 'Private', label: 'Pool' },
@@ -13,7 +12,7 @@ const stats = [
 ];
 
 const structuredData = {
-  '@context': 'https://schema.org', '@type': 'VacationRental', name: property.name, url: siteUrl,
+  '@context': 'https://schema.org', '@type': 'VacationRental', name: property.name, url: property.siteUrl,
   description: 'Private vacation villa for up to 10 guests with a swimming pool, hot tub and sauna, 25 minutes from Prishtina.',
   numberOfRooms: property.capacity.bedrooms,
   amenityFeature: property.amenities.flatMap((group) => group.items.map((item) => ({ '@type': 'LocationFeatureSpecification', name: item, value: true }))),
@@ -131,7 +130,7 @@ export default function Home() {
 
       <footer className="site-footer">
         <div className="footer-main">
-          <a href="#top" aria-label="Villa Ada home"><Image src="/branding/villa-ada-logo.jpg" alt="Villa Ada" width={86} height={86} className="footer-logo" /></a>
+          <a href="#top" aria-label="Villa Ada home"><Image src={property.logo} alt="Villa Ada" width={86} height={86} className="footer-logo" /></a>
           <p>{property.location.short}</p>
           <nav aria-label="Footer navigation"><a href="#the-villa">The Villa</a><a href="#wellness">Wellness</a><a href="#gallery">Gallery</a><a href="#amenities">Amenities</a><a href="#location">Location</a></nav>
           {property.airbnbUrl ? <a className="footer-airbnb" href={property.airbnbUrl} target="_blank" rel="noreferrer">Airbnb</a> : <span className="footer-airbnb muted">Airbnb coming soon</span>}
