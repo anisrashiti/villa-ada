@@ -1,6 +1,6 @@
 # Villa Ada
 
-A photo-led villa website built with React, Vinext and the existing Sites / Cloudflare configuration.
+A photo-led villa website built with the Next.js App Router and React.
 
 ## Local development
 
@@ -29,4 +29,4 @@ Cormorant Garamond and Manrope are self-hosted; their licenses are included in `
 
 The photo gallery and mobile menu use native modal dialogs with keyboard controls and focus restoration. The interior photo strip supports keyboard scrolling. Motion respects the visitor's reduced-motion preference, and scroll reveals progressively enhance content that is visible without JavaScript.
 
-The existing Sites project identifier and deployment configuration are preserved. Local development and production checks do not publish the site.
+The app uses standard Next.js commands and can be deployed through either Vercel or Netlify. Local development and production checks do not publish the site.
