@@ -1,105 +1,240 @@
 'use client';
 
-import Image from 'next/image';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
+  Expand,
+  X,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { PropertyImage } from './property-image';
 
 type GalleryImage = { src: string; alt: string };
+const filters = [
+  'All spaces',
+  'Pool & wellness',
+  'Outdoors',
+  'Interiors',
+] as const;
+type Filter = (typeof filters)[number];
+
+function category(src: string): Filter {
+  if (src.includes('outdoor-')) return 'Outdoors';
+  if (/pool|hot-tub|sauna/.test(src)) return 'Pool & wellness';
+  return 'Interiors';
+}
 
 export function Gallery({ images }: { images: readonly GalleryImage[] }) {
   const [active, setActive] = useState<number | null>(null);
-  const touchStart = useRef<number | null>(null);
-
+  const [filter, setFilter] = useState<Filter>('All spaces');
+  const [expanded, setExpanded] = useState(false);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const opener = useRef<HTMLButtonElement | null>(null);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const isOpen = active !== null;
   const close = useCallback(() => setActive(null), []);
-  const previous = useCallback(
-    () => setActive((index) => (index === null ? null : (index - 1 + images.length) % images.length)),
-    [images.length],
-  );
-  const next = useCallback(
-    () => setActive((index) => (index === null ? null : (index + 1) % images.length)),
+  const move = useCallback(
+    (direction: number) =>
+      setActive((index) =>
+        index === null
+          ? null
+          : (index + direction + images.length) % images.length,
+      ),
     [images.length],
   );
 
   useEffect(() => {
-    if (active === null) return;
+    const node = dialog.current;
+    if (!isOpen || !node) {
+      node?.close();
+      return;
+    }
+    const overflow = document.body.style.overflow;
+    node.showModal();
+    closeButton.current?.focus();
     document.body.style.overflow = 'hidden';
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') close();
-      if (event.key === 'ArrowLeft') previous();
-      if (event.key === 'ArrowRight') next();
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        move(event.key === 'ArrowLeft' ? -1 : 1);
+      }
     };
-    window.addEventListener('keydown', onKeyDown);
+    node.addEventListener('keydown', keydown);
     return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', onKeyDown);
+      node.removeEventListener('keydown', keydown);
+      node.close();
+      document.body.style.overflow = overflow;
+      opener.current?.focus({ preventScroll: true });
     };
-  }, [active, close, next, previous]);
+  }, [isOpen, move]);
+
+  const curatedOrder = [0, 7, 2, 3, 9, 1];
+  const ordered = [
+    ...curatedOrder,
+    ...images
+      .map((_, index) => index)
+      .filter((index) => !curatedOrder.includes(index)),
+  ].filter((index) => index < images.length);
+  const matching = ordered.filter(
+    (index) =>
+      filter === 'All spaces' || category(images[index].src) === filter,
+  );
+  const visible = expanded ? matching : matching.slice(0, 6);
 
   return (
     <>
-      <div className="gallery-grid">
-        {images.map((image, index) => (
+      <div className="gallery-toolbar">
+        <fieldset
+          className="gallery-filters"
+          aria-label="Filter photographs by space"
+        >
+          {filters.map((item) => (
+            <button
+              type="button"
+              key={item}
+              aria-pressed={filter === item}
+              onClick={() => {
+                setFilter(item);
+                setExpanded(false);
+              }}
+            >
+              {item}
+            </button>
+          ))}
+        </fieldset>
+        <span className="gallery-total" aria-live="polite">
+          {String(matching.length).padStart(2, '0')} photographs
+        </span>
+      </div>
+      <div id="gallery-photos" className="gallery-grid">
+        {visible.map((index, position) => (
           <button
-            className={`gallery-item gallery-item-${(index % 7) + 1}`}
-            key={`${image.src}-${index}`}
+            className={`gallery-item gallery-item-${(position % 6) + 1}`}
+            key={images[index].src}
             type="button"
-            onClick={() => setActive(index)}
-            aria-label={`Open photograph ${index + 1} of ${images.length}: ${image.alt}`}
+            onClick={(event) => {
+              opener.current = event.currentTarget;
+              setActive(index);
+            }}
+            aria-label={`Open photograph ${index + 1} of ${images.length}: ${images[index].alt}`}
           >
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 40vw"
-              className="cover-image"
+            <PropertyImage
+              {...images[index]}
+              sizes="(max-width: 600px) 90vw, (max-width: 1000px) 45vw, 42vw"
             />
+            <span className="gallery-photo-label">
+              {category(images[index].src)}
+            </span>
+            <span className="gallery-expand" aria-hidden="true">
+              <Expand size={18} />
+            </span>
           </button>
         ))}
       </div>
-
-      {active !== null && (
-        <dialog
-          open
-          className="lightbox"
-          aria-label="Villa Ada photo gallery"
-          onTouchStart={(event) => {
-            touchStart.current = event.changedTouches[0]?.clientX ?? null;
-          }}
-          onTouchEnd={(event) => {
-            if (touchStart.current === null) return;
-            const end = event.changedTouches[0]?.clientX ?? touchStart.current;
-            const distance = end - touchStart.current;
-            if (Math.abs(distance) > 55) {
-              if (distance > 0) previous();
-              else next();
-            }
-            touchStart.current = null;
-          }}
-        >
-          <button className="lightbox-close" type="button" onClick={close} aria-label="Close gallery">
+      <div className="gallery-bottom">
+        <p>Every corner, a little more yours.</p>
+        {matching.length > 6 && (
+          <button
+            className="text-link"
+            type="button"
+            aria-expanded={expanded}
+            aria-controls="gallery-photos"
+            onClick={() => {
+              setExpanded((value) => !value);
+              if (expanded)
+                document
+                  .querySelector('#gallery')
+                  ?.scrollIntoView({ behavior: 'instant' });
+            }}
+          >
+            {expanded
+              ? 'Show fewer photographs'
+              : `View all ${matching.length} photographs`}
+            {expanded ? (
+              <ArrowUpRight size={18} aria-hidden="true" />
+            ) : (
+              <ArrowDown size={18} aria-hidden="true" />
+            )}
+          </button>
+        )}
+      </div>
+      <dialog
+        ref={dialog}
+        className="lightbox"
+        aria-label="Villa Ada photo gallery"
+        onCancel={close}
+        onClose={close}
+        onTouchStart={(event) => {
+          const touch = event.changedTouches[0];
+          touchStart.current = touch
+            ? { x: touch.clientX, y: touch.clientY }
+            : null;
+        }}
+        onTouchEnd={(event) => {
+          const start = touchStart.current;
+          const end = event.changedTouches[0];
+          if (
+            start &&
+            end &&
+            Math.abs(end.clientX - start.x) > 55 &&
+            Math.abs(end.clientX - start.x) > Math.abs(end.clientY - start.y)
+          )
+            move(end.clientX > start.x ? -1 : 1);
+          touchStart.current = null;
+        }}
+      >
+        <div className="lightbox-top">
+          <span>
+            Villa Ada <i>/</i> A closer look
+          </span>
+          <button
+            ref={closeButton}
+            type="button"
+            onClick={close}
+            aria-label="Close gallery"
+          >
             <X aria-hidden="true" />
           </button>
-          <button className="lightbox-prev" type="button" onClick={previous} aria-label="Previous photograph">
-            <ChevronLeft aria-hidden="true" />
-          </button>
-          <div className="lightbox-image-wrap">
-            <Image
-              src={images[active].src}
-              alt={images[active].alt}
-              fill
-              sizes="100vw"
-              className="lightbox-image"
-              priority
-            />
-          </div>
-          <button className="lightbox-next" type="button" onClick={next} aria-label="Next photograph">
-            <ChevronRight aria-hidden="true" />
-          </button>
-          <p className="lightbox-counter">
-            {String(active + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
-          </p>
-        </dialog>
-      )}
+        </div>
+        <button
+          className="lightbox-prev"
+          type="button"
+          onClick={() => move(-1)}
+          aria-label="Previous photograph"
+        >
+          <ChevronLeft aria-hidden="true" />
+        </button>
+        {active !== null && (
+          <figure className="lightbox-figure">
+            <div className="lightbox-image-wrap">
+              <PropertyImage
+                {...images[active]}
+                sizes="90vw"
+                className="lightbox-image"
+                priority
+              />
+            </div>
+            <figcaption aria-live="polite">
+              <span>{images[active].alt}</span>
+              <span className="lightbox-counter">
+                {String(active + 1).padStart(2, '0')} /{' '}
+                {String(images.length).padStart(2, '0')}
+              </span>
+            </figcaption>
+          </figure>
+        )}
+        <button
+          className="lightbox-next"
+          type="button"
+          onClick={() => move(1)}
+          aria-label="Next photograph"
+        >
+          <ChevronRight aria-hidden="true" />
+        </button>
+      </dialog>
     </>
   );
 }

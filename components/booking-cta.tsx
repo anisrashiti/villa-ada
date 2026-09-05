@@ -1,29 +1,32 @@
+import { ArrowUpRight } from 'lucide-react';
 import { property } from '@/src/config/property';
 
-type BookingCtaProps = {
+export function BookingCta({
+  className = '',
+  compact = false,
+}: {
   className?: string;
   compact?: boolean;
-};
-
-export function BookingCta({ className = '', compact = false }: BookingCtaProps) {
-  const label = compact ? 'Airbnb coming soon' : 'Airbnb listing coming soon';
-
+}) {
   if (!property.airbnbUrl) {
     return (
-      <span className={`booking-cta is-disabled ${className}`} aria-disabled="true">
-        {label}
-      </span>
+      <p className={`booking-status ${className}`}>
+        <span aria-hidden="true" />
+        {compact
+          ? 'Coming soon on Airbnb'
+          : 'Our Airbnb listing is coming soon.'}
+      </p>
     );
   }
-
   return (
     <a
       className={`booking-cta ${className}`}
       href={property.airbnbUrl}
       target="_blank"
-      rel="noreferrer"
+      rel="noopener noreferrer"
     >
-      {compact ? 'Book on Airbnb' : 'View on Airbnb'}
+      View on Airbnb <ArrowUpRight size={18} aria-hidden="true" />
+      <span className="sr-only"> (opens in a new tab)</span>
     </a>
   );
 }
