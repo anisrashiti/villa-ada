@@ -2,6 +2,10 @@
 
 A photo-led villa website built with the Next.js App Router and React.
 
+The English site is served at `/` and the Albanian site at `/sq`. Both routes
+render the same shared components with localized copy from
+`src/i18n/dictionaries.ts`.
+
 ## Local development
 
 ```sh
@@ -16,7 +20,8 @@ On Windows PowerShell with script execution disabled, use `npm.cmd` and `npx.cmd
 
 ## Content and booking
 
-- Property facts, photographs and the canonical site URL live in `src/config/property.ts`.
+- Property facts, photograph paths and the canonical site URL live in `src/config/property.ts`.
+- All English and Albanian interface copy, image descriptions and accessibility labels live in `src/i18n/dictionaries.ts`.
 - Set `property.airbnbUrl` to the verified listing URL to enable booking links in the navigation, stay section and footer. Until then, the site displays a coming-soon message and navigation links to the stay section.
 - Add only verified guest reviews to `src/data/reviews.ts`. The guest-book section stays hidden while the list is empty.
 - Confirm the listing details and canonical URL before publishing. The gallery and other local interactions do not submit booking enquiries.

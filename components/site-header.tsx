@@ -2,23 +2,29 @@
 
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { property } from '@/src/config/property';
+import {
+  localePaths,
+  type Dictionary,
+  type Locale,
+} from '@/src/i18n/dictionaries';
 
-const links = [
-  { label: 'The villa', href: '#the-villa' },
-  { label: 'Wellness', href: '#wellness' },
-  { label: 'Gallery', href: '#gallery' },
-  { label: 'The details', href: '#amenities' },
-  { label: 'Location', href: '#location' },
-];
+const linkTargets = [
+  '#the-villa',
+  '#wellness',
+  '#gallery',
+  '#amenities',
+  '#location',
+] as const;
 
-function Brand({ onClick }: { onClick?: () => void }) {
+function Brand({ copy, onClick }: { copy: Dictionary; onClick?: () => void }) {
   return (
     <a
       href="#top"
       className="brand-link"
-      aria-label="Villa Ada home"
+      aria-label={copy.accessibility.brandHome}
       onClick={onClick}
     >
       <Image
@@ -29,13 +35,57 @@ function Brand({ onClick }: { onClick?: () => void }) {
         className="brand-logo"
       />
       <span>
-        Villa Ada<small>A PRIVATE RETREAT</small>
+        {property.name}
+        <small>{copy.brand.tagline}</small>
       </span>
     </a>
   );
 }
 
-export function SiteHeader() {
+function LanguageSwitcher({
+  locale,
+  label,
+  onClick,
+}: {
+  locale: Locale;
+  label: string;
+  onClick?: () => void;
+}) {
+  return (
+    <fieldset className="language-switcher">
+      <legend className="sr-only">{label}</legend>
+      <Link
+        href={localePaths.en}
+        hrefLang="en"
+        lang="en"
+        className={locale === 'en' ? 'is-active' : undefined}
+        aria-current={locale === 'en' ? 'page' : undefined}
+        onClick={onClick}
+      >
+        EN
+      </Link>
+      <span aria-hidden="true">/</span>
+      <Link
+        href={localePaths.sq}
+        hrefLang="sq"
+        lang="sq"
+        className={locale === 'sq' ? 'is-active' : undefined}
+        aria-current={locale === 'sq' ? 'page' : undefined}
+        onClick={onClick}
+      >
+        SQ
+      </Link>
+    </fieldset>
+  );
+}
+
+export function SiteHeader({
+  locale,
+  copy,
+}: {
+  locale: Locale;
+  copy: Dictionary;
+}) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -80,7 +130,7 @@ export function SiteHeader() {
       rel={property.airbnbUrl ? 'noopener noreferrer' : undefined}
       onClick={close}
     >
-      {property.airbnbUrl ? 'Book your stay' : 'Your stay'}
+      {property.airbnbUrl ? copy.navigation.book : copy.navigation.stay}
       <ArrowUpRight size={16} aria-hidden="true" />
     </a>
   );
@@ -88,13 +138,20 @@ export function SiteHeader() {
   return (
     <>
       <header className={`site-header ${scrolled ? 'is-scrolled' : ''}`}>
-        <Brand />
-        <nav className="desktop-nav" aria-label="Main navigation">
-          {links.map((link) => (
-            <a key={link.href} href={link.href}>
-              {link.label}
+        <Brand copy={copy} />
+        <nav
+          className="desktop-nav"
+          aria-label={copy.accessibility.mainNavigation}
+        >
+          {linkTargets.map((href, index) => (
+            <a key={href} href={href}>
+              {copy.navigation.links[index]}
             </a>
           ))}
+          <LanguageSwitcher
+            locale={locale}
+            label={copy.accessibility.languageSwitcher}
+          />
           {booking}
         </nav>
         <button
@@ -103,10 +160,10 @@ export function SiteHeader() {
           type="button"
           aria-expanded={open}
           aria-controls="mobile-menu"
-          aria-label="Open navigation menu"
+          aria-label={copy.accessibility.openMenu}
           onClick={() => setOpen(true)}
         >
-          <span>Menu</span>
+          <span>{copy.navigation.menu}</span>
           <Menu size={22} aria-hidden="true" />
         </button>
       </header>
@@ -114,7 +171,7 @@ export function SiteHeader() {
         id="mobile-menu"
         ref={dialog}
         className="mobile-menu"
-        aria-label="Navigation menu"
+        aria-label={copy.accessibility.navigationMenu}
         onCancel={close}
         onClose={() => {
           setOpen(false);
@@ -122,29 +179,36 @@ export function SiteHeader() {
         }}
       >
         <div className="mobile-menu-top">
-          <Brand onClick={close} />
+          <Brand copy={copy} onClick={close} />
           <button
             className="menu-button"
             type="button"
             onClick={close}
-            aria-label="Close navigation menu"
+            aria-label={copy.accessibility.closeMenu}
           >
             <X aria-hidden="true" />
           </button>
         </div>
-        <p className="eyebrow">A little look around</p>
-        <nav aria-label="Mobile navigation">
-          {links.map((link, index) => (
-            <a key={link.href} href={link.href} onClick={close}>
+        <div className="mobile-menu-intro">
+          <p className="eyebrow">{copy.navigation.mobileEyebrow}</p>
+          <LanguageSwitcher
+            locale={locale}
+            label={copy.accessibility.languageSwitcher}
+            onClick={close}
+          />
+        </div>
+        <nav aria-label={copy.accessibility.mobileNavigation}>
+          {linkTargets.map((href, index) => (
+            <a key={href} href={href} onClick={close}>
               <span className="nav-number">0{index + 1}</span>
-              {link.label}
+              {copy.navigation.links[index]}
               <ArrowUpRight aria-hidden="true" />
             </a>
           ))}
         </nav>
         <div className="mobile-menu-bottom">
           {booking}
-          <p>{property.location.short}</p>
+          <p>{copy.location.short}</p>
         </div>
       </dialog>
     </>

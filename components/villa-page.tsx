@@ -18,44 +18,21 @@ import { ReviewsSection } from '@/components/reviews-section';
 import { ScrollReveal } from '@/components/scroll-reveal';
 import { SiteHeader } from '@/components/site-header';
 import { property } from '@/src/config/property';
+import {
+  dictionaries,
+  localePaths,
+  type Dictionary,
+  type Locale,
+} from '@/src/i18n/dictionaries';
 
-const stats = [
-  { value: '10', label: 'Guests', note: 'Bring your favourite people' },
-  {
-    value: '2',
-    label: 'Bedrooms',
-    note: 'Plus sleeping space in the living area',
-  },
-  {
-    value: '1 + WC',
-    label: 'Bathrooms',
-    note: 'A full bathroom & an extra WC',
-  },
-  {
-    value: 'All yours',
-    label: 'The whole villa',
-    note: 'Pool, garden, hot tub & sauna',
-  },
-];
 const amenityIcons = [Waves, Flame, CookingPot, Bath, CarFront];
-const structuredData = {
-  '@context': 'https://schema.org',
-  '@type': 'LodgingBusiness',
-  name: property.name,
-  url: property.siteUrl,
-  description:
-    'Private vacation villa for up to 10 guests with a swimming pool, hot tub and sauna, 25 minutes from Prishtina.',
-  image: new URL('/images/optimized/hero-pool-01-1600.webp', property.siteUrl)
-    .href,
-  numberOfRooms: property.capacity.bedrooms,
-  amenityFeature: property.amenities.flatMap((group) =>
-    group.items.map((item) => ({
-      '@type': 'LocationFeatureSpecification',
-      name: item,
-      value: true,
-    })),
-  ),
-};
+const sectionLinks = [
+  '#the-villa',
+  '#wellness',
+  '#gallery',
+  '#amenities',
+  '#location',
+] as const;
 
 function SectionLabel({
   number,
@@ -74,17 +51,46 @@ function SectionLabel({
   );
 }
 
-export default function Home() {
+function createStructuredData(locale: Locale, copy: Dictionary) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'LodgingBusiness',
+    name: property.name,
+    url: new URL(localePaths[locale], property.siteUrl).href,
+    description: copy.metadata.description,
+    inLanguage: locale,
+    image: new URL('/images/optimized/hero-pool-01-1600.webp', property.siteUrl)
+      .href,
+    numberOfRooms: property.capacity.bedrooms,
+    amenityFeature: copy.amenities.groups.flatMap((group) =>
+      group.items.map((item) => ({
+        '@type': 'LocationFeatureSpecification',
+        name: item,
+        value: true,
+      })),
+    ),
+  };
+}
+
+export function VillaPage({ locale }: { locale: Locale }) {
+  const copy = dictionaries[locale];
+  const gallery = property.gallery.map((src, index) => ({
+    src,
+    alt: copy.images.gallery[index],
+  }));
+  const structuredData = createStructuredData(locale, copy);
+
   return (
     <>
       <a className="skip-link" href="#main-content">
-        Skip to content
+        {copy.accessibility.skipToContent}
       </a>
-      <SiteHeader />
+      <SiteHeader locale={locale} copy={copy} />
       <main id="main-content" tabIndex={-1}>
         <section id="top" className="hero" aria-labelledby="hero-title">
           <PropertyImage
-            {...property.images.hero}
+            src={property.images.hero}
+            alt={copy.images.hero}
             priority
             sizes="(max-aspect-ratio: 4/3) 134vh, 100vw"
             className="hero-image"
@@ -92,68 +98,65 @@ export default function Home() {
           <div className="hero-overlay" />
           <div className="hero-content">
             <p className="hero-kicker">
-              <span />A private retreat · 25 minutes from Prishtina
+              <span />
+              {copy.hero.kicker}
             </p>
             <h1 id="hero-title">
-              A slower
+              {copy.hero.heading.lead}
               <br />
-              <em>kind of stay.</em>
+              <em>{copy.hero.heading.emphasis}</em>
             </h1>
             <div className="hero-intro">
               <p>
-                Pool days. Unhurried evenings.
-                <br />A little world of your own.
+                {copy.hero.intro[0]}
+                <br />
+                {copy.hero.intro[1]}
               </p>
               <a className="booking-cta booking-cta-light" href="#introduction">
-                Discover Villa Ada
+                {copy.hero.discover}
                 <ArrowDown size={18} aria-hidden="true" />
               </a>
             </div>
           </div>
           <div className="hero-bottom">
             <p>
-              Private pool <span>·</span> Hot tub <span>·</span> Sauna
+              {copy.hero.highlights[0]} <span>·</span> {copy.hero.highlights[1]}{' '}
+              <span>·</span> {copy.hero.highlights[2]}
             </p>
             <a href="#the-villa">
-              Up to 10 guests <ArrowUpRight size={16} aria-hidden="true" />
+              {copy.hero.capacity} <ArrowUpRight size={16} aria-hidden="true" />
             </a>
           </div>
           <a
             className="hero-side-link"
             href="#gallery"
-            aria-label="Explore the photo gallery"
+            aria-label={copy.hero.galleryLink}
           >
-            Take a look around <ArrowUpRight size={16} aria-hidden="true" />
+            {copy.hero.galleryLink}{' '}
+            <ArrowUpRight size={16} aria-hidden="true" />
           </a>
         </section>
 
         <section id="introduction" className="intro section-shell">
           <div className="intro-heading" data-reveal>
-            <SectionLabel number="01">The escape</SectionLabel>
+            <SectionLabel number="01">{copy.introduction.label}</SectionLabel>
             <h2 className="display-heading">
-              A place to pause.
+              {copy.introduction.heading.lead}
               <br />
-              <em>Room to be together.</em>
+              <em>{copy.introduction.heading.emphasis}</em>
             </h2>
           </div>
           <div className="intro-copy" data-reveal>
-            <p>
-              Close to Prishtina, a little further from the everyday. Villa Ada
-              is a private retreat for pool days, long evenings outdoors and
-              time with your favourite people.
-            </p>
-            <p>
-              With space for ten, a generous garden and your own pool, hot tub
-              and sauna, there’s room to settle in. And very little reason to
-              hurry.
-            </p>
+            {copy.introduction.paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
             <a className="text-link" href="#the-villa">
-              Make yourself at home
+              {copy.introduction.link}
               <ArrowUpRight size={18} aria-hidden="true" />
             </a>
           </div>
           <dl className="stats-row" data-reveal>
-            {stats.map((stat) => (
+            {copy.introduction.stats.map((stat) => (
               <div key={stat.label}>
                 <dt>{stat.label}</dt>
                 <dd>{stat.value}</dd>
@@ -168,72 +171,73 @@ export default function Home() {
             <div className="wellness-heading" data-reveal>
               <div>
                 <SectionLabel number="02" light>
-                  Pool & wellness
+                  {copy.wellness.label}
                 </SectionLabel>
                 <h2 className="display-heading">
-                  The art of
+                  {copy.wellness.heading.lead}
                   <br />
-                  <em>doing very little.</em>
+                  <em>{copy.wellness.heading.emphasis}</em>
                 </h2>
               </div>
               <p>
-                A swim, a soak, the warmth of the sauna.
-                <br /> Find your own rhythm. It’s all yours.
+                {copy.wellness.intro[0]}
+                <br /> {copy.wellness.intro[1]}
               </p>
             </div>
             <div className="wellness-grid">
               <figure className="wellness-pool" data-reveal>
                 <div className="image-frame">
                   <PropertyImage
-                    {...property.images.exterior}
+                    src={property.images.exterior}
+                    alt={copy.images.exterior}
                     sizes="(max-width: 700px) 90vw, 50vw"
                   />
                 </div>
                 <figcaption>
                   <span className="photo-number">01 /</span>
                   <div>
-                    <h3>Take the day poolside.</h3>
-                    <p>
-                      A private pool, loungers and a garden to call your own.
-                    </p>
+                    <h3>{copy.wellness.cards[0].title}</h3>
+                    <p>{copy.wellness.cards[0].description}</p>
                   </div>
                 </figcaption>
               </figure>
               <figure className="wellness-hot-tub" data-reveal>
                 <div className="image-frame">
                   <PropertyImage
-                    {...property.images.hotTub}
+                    src={property.images.hotTub}
+                    alt={copy.images.hotTub}
                     sizes="(max-width: 700px) 44vw, 25vw"
                   />
                 </div>
                 <figcaption>
                   <span className="photo-number">02 /</span>
                   <div>
-                    <h3>Soak it all in.</h3>
-                    <p>Your own private hot tub.</p>
+                    <h3>{copy.wellness.cards[1].title}</h3>
+                    <p>{copy.wellness.cards[1].description}</p>
                   </div>
                 </figcaption>
               </figure>
               <figure className="wellness-sauna" data-reveal>
                 <div className="image-frame">
                   <PropertyImage
-                    {...property.images.sauna}
+                    src={property.images.sauna}
+                    alt={copy.images.sauna}
                     sizes="(max-width: 700px) 44vw, 25vw"
                   />
                 </div>
                 <figcaption>
                   <span className="photo-number">03 /</span>
                   <div>
-                    <h3>Stay a little warmer.</h3>
-                    <p>Timber, warmth and a garden view.</p>
+                    <h3>{copy.wellness.cards[2].title}</h3>
+                    <p>{copy.wellness.cards[2].description}</p>
                   </div>
                 </figcaption>
               </figure>
             </div>
             <div className="wellness-note">
-              <span>Nowhere else to be.</span>
+              <span>{copy.wellness.note}</span>
               <a className="text-link" href="#gallery">
-                Explore the spaces
+                {copy.wellness.link}
                 <ArrowUpRight size={18} aria-hidden="true" />
               </a>
             </div>
@@ -242,40 +246,36 @@ export default function Home() {
 
         <section id="outdoors" className="outdoor-section section-shell">
           <div className="outdoor-copy" data-reveal>
-            <SectionLabel number="03">Outdoor living</SectionLabel>
+            <SectionLabel number="03">{copy.outdoors.label}</SectionLabel>
             <h2 className="display-heading">
-              Outside,
+              {copy.outdoors.heading.lead}
               <br />
-              <em>all day.</em>
+              <em>{copy.outdoors.heading.emphasis}</em>
             </h2>
-            <p>
-              Long afternoons become BBQ evenings. Settle into the covered
-              lounge, gather around the table or find a quiet moment in the
-              hammock.
-            </p>
-            <p>
-              From the first dip to the last conversation, the garden brings
-              everyone together.
-            </p>
-            <span className="detail-label">Garden · Lounge · BBQ</span>
+            {copy.outdoors.paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+            <span className="detail-label">{copy.outdoors.detail}</span>
           </div>
           <figure className="outdoor-lead" data-reveal>
             <div className="image-frame">
               <PropertyImage
-                {...property.images.poolside}
+                src={property.images.poolside}
+                alt={copy.images.poolside}
                 sizes="(max-width: 700px) 90vw, 52vw"
               />
             </div>
-            <figcaption>A little shade. A little more time.</figcaption>
+            <figcaption>{copy.outdoors.leadCaption}</figcaption>
           </figure>
           <figure className="outdoor-inset" data-reveal>
             <div className="image-frame">
               <PropertyImage
-                {...property.images.grill}
+                src={property.images.grill}
+                alt={copy.images.grill}
                 sizes="(max-width: 700px) 50vw, 25vw"
               />
             </div>
-            <figcaption>Good evenings start here.</figcaption>
+            <figcaption>{copy.outdoors.insetCaption}</figcaption>
           </figure>
         </section>
 
@@ -285,50 +285,45 @@ export default function Home() {
               <figure className="villa-image" data-reveal>
                 <div className="image-frame">
                   <PropertyImage
-                    {...property.images.living}
+                    src={property.images.living}
+                    alt={copy.images.living}
                     sizes="(max-width: 900px) 90vw, 52vw"
                   />
                 </div>
-                <figcaption>
-                  Timber beams, warm brick, room for everyone.
-                </figcaption>
+                <figcaption>{copy.villa.imageCaption}</figcaption>
               </figure>
               <div className="villa-copy" data-reveal>
-                <SectionLabel number="04">Inside Villa Ada</SectionLabel>
+                <SectionLabel number="04">{copy.villa.label}</SectionLabel>
                 <h2 className="display-heading">
-                  Come in.
+                  {copy.villa.heading.lead}
                   <br />
-                  <em>Feel at home.</em>
+                  <em>{copy.villa.heading.emphasis}</em>
                 </h2>
-                <p>
-                  A fireplace, exposed brick and timber beams give the living
-                  room its warm, easy character. The fully equipped kitchen and
-                  dining area keep everyone connected between days outside.
-                </p>
+                <p>{copy.villa.description}</p>
                 <div className="villa-features">
                   <span>
                     <Flame size={17} aria-hidden="true" />
-                    Fireplace
+                    {copy.villa.features[0]}
                   </span>
                   <span>
                     <Wifi size={17} aria-hidden="true" />
-                    Wi-Fi
+                    {copy.villa.features[1]}
                   </span>
                   <span>
                     <CookingPot size={17} aria-hidden="true" />
-                    Full kitchen
+                    {copy.villa.features[2]}
                   </span>
                 </div>
                 <div className="sleeping-list">
                   <h3>
                     <BedDouble size={18} aria-hidden="true" />
-                    Space for up to 10
+                    {copy.villa.sleepingTitle}
                   </h3>
-                  {property.sleeping.map((item) => (
+                  {copy.villa.sleeping.map((item) => (
                     <div key={item.space}>
                       <span>{item.space}</span>
                       <span className="sleeping-line" />
-                      <strong>{item.guests} guests</strong>
+                      <strong>{item.guests}</strong>
                     </div>
                   ))}
                 </div>
@@ -339,48 +334,51 @@ export default function Home() {
               className="interior-strip"
               data-reveal
               tabIndex={0}
-              aria-label="Interior photographs; scroll horizontally on small screens"
+              aria-label={copy.accessibility.interiorStrip}
             >
               <figure>
                 <div className="image-frame">
                   <PropertyImage
                     src="/images/bedroom-02.jpeg"
-                    alt="Bedroom one with sleeping space for four guests"
+                    alt={copy.images.bedroomFour}
                     sizes="(max-width: 600px) 72vw, 32vw"
                   />
                 </div>
                 <figcaption>
-                  <span>01</span>Room to rest
+                  <span>01</span>
+                  {copy.villa.interiorCaptions[0]}
                 </figcaption>
               </figure>
               <figure>
                 <div className="image-frame">
                   <PropertyImage
                     src="/images/kitchen-01.jpeg"
-                    alt="Fully equipped kitchen and indoor dining table"
+                    alt={copy.images.kitchen}
                     sizes="(max-width: 600px) 72vw, 32vw"
                   />
                 </div>
                 <figcaption>
-                  <span>02</span>Gather around the table
+                  <span>02</span>
+                  {copy.villa.interiorCaptions[1]}
                 </figcaption>
               </figure>
               <figure>
                 <div className="image-frame">
                   <PropertyImage
                     src="/images/bathroom-01.jpeg"
-                    alt="Full bathroom with a glass walk-in shower"
+                    alt={copy.images.bathroom}
                     sizes="(max-width: 600px) 72vw, 32vw"
                   />
                 </div>
                 <figcaption>
-                  <span>03</span>The everyday comforts
+                  <span>03</span>
+                  {copy.villa.interiorCaptions[2]}
                 </figcaption>
               </figure>
             </section>
             {/* oxlint-enable jsx-a11y/no-noninteractive-tabindex */}
             <p className="swipe-note">
-              Swipe to look around <ArrowUpRight size={15} aria-hidden="true" />
+              {copy.villa.swipe} <ArrowUpRight size={15} aria-hidden="true" />
             </p>
           </div>
         </section>
@@ -388,34 +386,33 @@ export default function Home() {
         <section id="gallery" className="gallery-section section-shell">
           <div className="gallery-heading" data-reveal>
             <div>
-              <SectionLabel number="05">The photographs</SectionLabel>
+              <SectionLabel number="05">{copy.gallery.label}</SectionLabel>
               <h2 className="display-heading">
-                Picture <em>yourself here.</em>
+                {copy.gallery.heading.lead}{' '}
+                <em>{copy.gallery.heading.emphasis}</em>
               </h2>
             </div>
             <p>
-              From the pool to the fireside.
-              <br /> Explore every space.
+              {copy.gallery.intro[0]}
+              <br /> {copy.gallery.intro[1]}
             </p>
           </div>
-          <Gallery images={property.gallery} />
+          <Gallery images={gallery} copy={copy.gallery} />
         </section>
 
         <section id="amenities" className="amenities-section">
           <div className="section-shell amenities-layout">
             <div className="amenities-heading" data-reveal>
-              <SectionLabel number="06">The details</SectionLabel>
+              <SectionLabel number="06">{copy.amenities.label}</SectionLabel>
               <h2 className="display-heading">
-                Settle in.
+                {copy.amenities.heading.lead}
                 <br />
-                <em>It’s all here.</em>
+                <em>{copy.amenities.heading.emphasis}</em>
               </h2>
-              <p>
-                The little things that make a stay feel easy, inside and out.
-              </p>
+              <p>{copy.amenities.intro}</p>
             </div>
             <div className="amenities-list" data-reveal>
-              {property.amenities.map((group, index) => {
+              {copy.amenities.groups.map((group, index) => {
                 const Icon = amenityIcons[index];
                 return (
                   <details
@@ -450,93 +447,99 @@ export default function Home() {
         <section id="location" className="location-section section-shell">
           <div className="location-time" data-reveal>
             <span className="location-number">25</span>
-            <p>minutes from Prishtina</p>
+            <p>{copy.location.short.replace(/^25\s*/, '')}</p>
             <span className="location-byline">
               <CarFront size={17} aria-hidden="true" />
-              An easy drive. A different pace.
+              {copy.location.byline}
             </span>
           </div>
           <div className="location-copy" data-reveal>
-            <SectionLabel number="07">Near, yet away</SectionLabel>
+            <SectionLabel number="07">{copy.location.label}</SectionLabel>
             <h2 className="display-heading">
-              Less travelling.
+              {copy.location.heading.lead}
               <br />
-              <em>More being here.</em>
+              <em>{copy.location.heading.emphasis}</em>
             </h2>
-            <p>{property.location.description}</p>
+            <p>{copy.location.description}</p>
             <div
               className="location-route"
-              aria-label="25 minutes by car from Prishtina to Villa Ada"
+              aria-label={copy.location.routeAria}
             >
-              <span>Prishtina</span>
+              <span>{copy.location.origin}</span>
               <i aria-hidden="true" />
-              <strong>Villa Ada</strong>
+              <strong>{copy.location.destination}</strong>
             </div>
           </div>
         </section>
 
-        <ReviewsSection />
+        <ReviewsSection copy={copy.reviews} />
         <section
           id="your-stay"
           className="final-cta"
           aria-labelledby="final-title"
         >
-          <PropertyImage {...property.images.exterior} sizes="100vw" />
+          <PropertyImage
+            src={property.images.exterior}
+            alt={copy.images.exterior}
+            sizes="100vw"
+          />
           <div className="final-overlay" />
           <div className="final-content section-shell" data-reveal>
-            <p className="eyebrow eyebrow-light">Your stay at Villa Ada</p>
+            <p className="eyebrow eyebrow-light">{copy.finalCta.label}</p>
             <h2 id="final-title">
-              A little less rush.
+              {copy.finalCta.heading.lead}
               <br />
-              <em>A little more you.</em>
+              <em>{copy.finalCta.heading.emphasis}</em>
             </h2>
             <p>
-              Bring your favourite people.
-              <br />
-              We’ve made room for the slow days.
+              {copy.finalCta.intro[0]}
+              <br /> {copy.finalCta.intro[1]}
             </p>
-            <BookingCta className="booking-cta-light" />
+            <BookingCta copy={copy.booking} className="booking-cta-light" />
             <a className="final-gallery-link" href="#gallery">
-              One more look around
+              {copy.finalCta.galleryLink}
               <ArrowUpRight size={18} aria-hidden="true" />
             </a>
           </div>
-          <p className="final-location">
-            Private villa · 25 minutes from Prishtina
-          </p>
+          <p className="final-location">{copy.finalCta.location}</p>
         </section>
       </main>
 
       <footer className="site-footer">
         <div className="section-shell">
           <div className="footer-top">
-            <a className="footer-brand" href="#top" aria-label="Villa Ada home">
+            <a
+              className="footer-brand"
+              href="#top"
+              aria-label={copy.accessibility.brandHome}
+            >
               <Image src={property.logo} alt="" width={64} height={64} />
-              <span>Villa Ada</span>
+              <span>{property.name}</span>
             </a>
             <p>
-              Your own little escape.
-              <br />
-              Just outside Prishtina.
+              {copy.footer.intro[0]}
+              <br /> {copy.footer.intro[1]}
             </p>
             <a className="back-to-top" href="#top">
-              Back to the top
+              {copy.footer.backToTop}
               <ArrowUpRight size={18} aria-hidden="true" />
             </a>
           </div>
           <div className="footer-middle">
-            <nav aria-label="Footer navigation">
-              <a href="#the-villa">The villa</a>
-              <a href="#wellness">Wellness</a>
-              <a href="#gallery">Gallery</a>
-              <a href="#amenities">The details</a>
-              <a href="#location">Location</a>
+            <nav aria-label={copy.accessibility.mainNavigation}>
+              {sectionLinks.map((href, index) => (
+                <a href={href} key={href}>
+                  {copy.navigation.links[index]}
+                </a>
+              ))}
             </nav>
-            <BookingCta compact />
+            <BookingCta copy={copy.booking} compact />
           </div>
           <div className="footer-base">
-            <span>© {new Date().getFullYear()} Villa Ada</span>
-            <span>Private pool. Warm welcome. Slow days.</span>
+            <span>
+              © {new Date().getFullYear()} {copy.footer.copyright}
+            </span>
+            <span>{copy.footer.closing}</span>
           </div>
         </div>
       </footer>

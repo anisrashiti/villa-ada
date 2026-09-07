@@ -9,26 +9,28 @@ import {
   X,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { Dictionary } from '@/src/i18n/dictionaries';
 import { PropertyImage } from './property-image';
 
 type GalleryImage = { src: string; alt: string };
-const filters = [
-  'All spaces',
-  'Pool & wellness',
-  'Outdoors',
-  'Interiors',
-] as const;
+const filters = ['all', 'wellness', 'outdoors', 'interiors'] as const;
 type Filter = (typeof filters)[number];
 
-function category(src: string): Filter {
-  if (src.includes('outdoor-')) return 'Outdoors';
-  if (/pool|hot-tub|sauna/.test(src)) return 'Pool & wellness';
-  return 'Interiors';
+function category(src: string): Exclude<Filter, 'all'> {
+  if (src.includes('outdoor-')) return 'outdoors';
+  if (/pool|hot-tub|sauna/.test(src)) return 'wellness';
+  return 'interiors';
 }
 
-export function Gallery({ images }: { images: readonly GalleryImage[] }) {
+export function Gallery({
+  images,
+  copy,
+}: {
+  images: readonly GalleryImage[];
+  copy: Dictionary['gallery'];
+}) {
   const [active, setActive] = useState<number | null>(null);
-  const [filter, setFilter] = useState<Filter>('All spaces');
+  const [filter, setFilter] = useState<Filter>('all');
   const [expanded, setExpanded] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
@@ -79,18 +81,14 @@ export function Gallery({ images }: { images: readonly GalleryImage[] }) {
       .filter((index) => !curatedOrder.includes(index)),
   ].filter((index) => index < images.length);
   const matching = ordered.filter(
-    (index) =>
-      filter === 'All spaces' || category(images[index].src) === filter,
+    (index) => filter === 'all' || category(images[index].src) === filter,
   );
   const visible = expanded ? matching : matching.slice(0, 6);
 
   return (
     <>
       <div className="gallery-toolbar">
-        <fieldset
-          className="gallery-filters"
-          aria-label="Filter photographs by space"
-        >
+        <fieldset className="gallery-filters" aria-label={copy.filterAria}>
           {filters.map((item) => (
             <button
               type="button"
@@ -101,12 +99,12 @@ export function Gallery({ images }: { images: readonly GalleryImage[] }) {
                 setExpanded(false);
               }}
             >
-              {item}
+              {copy.filters[item]}
             </button>
           ))}
         </fieldset>
         <span className="gallery-total" aria-live="polite">
-          {String(matching.length).padStart(2, '0')} photographs
+          {String(matching.length).padStart(2, '0')} {copy.photographs}
         </span>
       </div>
       <div id="gallery-photos" className="gallery-grid">
@@ -119,14 +117,14 @@ export function Gallery({ images }: { images: readonly GalleryImage[] }) {
               opener.current = event.currentTarget;
               setActive(index);
             }}
-            aria-label={`Open photograph ${index + 1} of ${images.length}: ${images[index].alt}`}
+            aria-label={`${copy.openPhotograph} ${index + 1} ${copy.of} ${images.length}: ${images[index].alt}`}
           >
             <PropertyImage
               {...images[index]}
               sizes="(max-width: 600px) 90vw, (max-width: 1000px) 45vw, 42vw"
             />
             <span className="gallery-photo-label">
-              {category(images[index].src)}
+              {copy.filters[category(images[index].src)]}
             </span>
             <span className="gallery-expand" aria-hidden="true">
               <Expand size={18} />
@@ -135,7 +133,7 @@ export function Gallery({ images }: { images: readonly GalleryImage[] }) {
         ))}
       </div>
       <div className="gallery-bottom">
-        <p>Every corner, a little more yours.</p>
+        <p>{copy.bottomNote}</p>
         {matching.length > 6 && (
           <button
             className="text-link"
@@ -151,8 +149,8 @@ export function Gallery({ images }: { images: readonly GalleryImage[] }) {
             }}
           >
             {expanded
-              ? 'Show fewer photographs'
-              : `View all ${matching.length} photographs`}
+              ? copy.showFewer
+              : `${copy.viewAll} ${matching.length} ${copy.photographs}`}
             {expanded ? (
               <ArrowUpRight size={18} aria-hidden="true" />
             ) : (
@@ -164,7 +162,7 @@ export function Gallery({ images }: { images: readonly GalleryImage[] }) {
       <dialog
         ref={dialog}
         className="lightbox"
-        aria-label="Villa Ada photo gallery"
+        aria-label={copy.lightboxAria}
         onCancel={close}
         onClose={close}
         onTouchStart={(event) => {
@@ -188,13 +186,13 @@ export function Gallery({ images }: { images: readonly GalleryImage[] }) {
       >
         <div className="lightbox-top">
           <span>
-            Villa Ada <i>/</i> A closer look
+            Villa Ada <i>/</i> {copy.closerLook}
           </span>
           <button
             ref={closeButton}
             type="button"
             onClick={close}
-            aria-label="Close gallery"
+            aria-label={copy.close}
           >
             <X aria-hidden="true" />
           </button>
@@ -203,7 +201,7 @@ export function Gallery({ images }: { images: readonly GalleryImage[] }) {
           className="lightbox-prev"
           type="button"
           onClick={() => move(-1)}
-          aria-label="Previous photograph"
+          aria-label={copy.previous}
         >
           <ChevronLeft aria-hidden="true" />
         </button>
@@ -230,7 +228,7 @@ export function Gallery({ images }: { images: readonly GalleryImage[] }) {
           className="lightbox-next"
           type="button"
           onClick={() => move(1)}
-          aria-label="Next photograph"
+          aria-label={copy.next}
         >
           <ChevronRight aria-hidden="true" />
         </button>
