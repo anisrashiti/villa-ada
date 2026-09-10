@@ -11,13 +11,7 @@ import {
   type Locale,
 } from '@/src/i18n/dictionaries';
 
-const linkTargets = [
-  '#the-villa',
-  '#wellness',
-  '#gallery',
-  '#amenities',
-  '#location',
-] as const;
+const linkTargets = ['#top', '#the-villa', '#gallery', '#location'] as const;
 
 function Brand({ copy, onClick }: { copy: Dictionary; onClick?: () => void }) {
   return (
@@ -88,11 +82,29 @@ export function SiteHeader({
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState('#top');
+  const labels = [
+    copy.editorial.home,
+    copy.editorial.stay,
+    copy.editorial.experience,
+    copy.editorial.location,
+  ];
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 48);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 48);
+      setActive(
+        [...linkTargets]
+          .reverse()
+          .find(
+            (target) =>
+              (document.querySelector(target)?.getBoundingClientRect().top ??
+                Infinity) <= 150,
+          ) || '#top',
+      );
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     const desktop = window.matchMedia('(min-width: 1001px)');
@@ -144,8 +156,12 @@ export function SiteHeader({
           aria-label={copy.accessibility.mainNavigation}
         >
           {linkTargets.map((href, index) => (
-            <a key={href} href={href}>
-              {copy.navigation.links[index]}
+            <a
+              key={href}
+              href={href}
+              aria-current={active === href ? 'location' : undefined}
+            >
+              {labels[index]}
             </a>
           ))}
           <LanguageSwitcher
@@ -199,9 +215,14 @@ export function SiteHeader({
         </div>
         <nav aria-label={copy.accessibility.mobileNavigation}>
           {linkTargets.map((href, index) => (
-            <a key={href} href={href} onClick={close}>
+            <a
+              key={href}
+              href={href}
+              onClick={close}
+              aria-current={active === href ? 'location' : undefined}
+            >
               <span className="nav-number">0{index + 1}</span>
-              {copy.navigation.links[index]}
+              {labels[index]}
               <ArrowUpRight aria-hidden="true" />
             </a>
           ))}

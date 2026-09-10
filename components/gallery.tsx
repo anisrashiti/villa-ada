@@ -12,7 +12,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Dictionary } from '@/src/i18n/dictionaries';
 import { PropertyImage } from './property-image';
 
-type GalleryImage = { src: string; alt: string };
+type GalleryImage = { src: string; alt: string; caption?: string };
 const filters = ['all', 'wellness', 'outdoors', 'interiors'] as const;
 type Filter = (typeof filters)[number];
 
@@ -73,7 +73,7 @@ export function Gallery({
     };
   }, [isOpen, move]);
 
-  const curatedOrder = [0, 7, 2, 3, 9, 1];
+  const curatedOrder = [0, 1, 3, 2];
   const ordered = [
     ...curatedOrder,
     ...images
@@ -83,7 +83,7 @@ export function Gallery({
   const matching = ordered.filter(
     (index) => filter === 'all' || category(images[index].src) === filter,
   );
-  const visible = expanded ? matching : matching.slice(0, 6);
+  const visible = expanded ? matching : matching.slice(0, 4);
 
   return (
     <>
@@ -107,7 +107,10 @@ export function Gallery({
           {String(matching.length).padStart(2, '0')} {copy.photographs}
         </span>
       </div>
-      <div id="gallery-photos" className="gallery-grid">
+      <div
+        id="gallery-photos"
+        className={`gallery-grid ${expanded ? 'is-expanded' : ''}`}
+      >
         {visible.map((index, position) => (
           <button
             className={`gallery-item gallery-item-${(position % 6) + 1}`}
@@ -124,7 +127,8 @@ export function Gallery({
               sizes="(max-width: 600px) 90vw, (max-width: 1000px) 45vw, 42vw"
             />
             <span className="gallery-photo-label">
-              {copy.filters[category(images[index].src)]}
+              {images[index].caption ||
+                copy.filters[category(images[index].src)]}
             </span>
             <span className="gallery-expand" aria-hidden="true">
               <Expand size={18} />
@@ -134,7 +138,7 @@ export function Gallery({
       </div>
       <div className="gallery-bottom">
         <p>{copy.bottomNote}</p>
-        {matching.length > 6 && (
+        {matching.length > 4 && (
           <button
             className="text-link"
             type="button"

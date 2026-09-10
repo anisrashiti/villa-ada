@@ -3,9 +3,13 @@ export const property = {
   siteUrl: 'https://villa-ada-retreat.anisbaba.chatgpt.site',
   logo: '/branding/villa-ada-logo.jpg',
   airbnbUrl: '',
+  video: '/video/villa-ada-hero.mp4',
+  videoPoster: '/video/villa-ada-poster.webp',
+  location: { address: '', mapsUrl: '' },
   capacity: {
     guests: 10,
     bedrooms: 2,
+    beds: 3,
     fullBathrooms: 1,
     additionalWCs: 1,
   },

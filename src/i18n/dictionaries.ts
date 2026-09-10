@@ -1,6 +1,41 @@
 export type Locale = 'en' | 'sq';
 
 const en = {
+  editorial: {
+    home: 'Home',
+    stay: 'The stay',
+    experience: 'The experience',
+    location: 'Find us',
+    escape: 'A private escape',
+    near: 'close to Prishtina.',
+    distance: 'Approx. 25 min from Prishtina',
+    explore: 'Explore the villa',
+    reserve: 'Plan your stay',
+    film: 'A glimpse of Villa Ada',
+    pause: 'Pause film',
+    play: 'Play film',
+    stayLead: 'Your people.',
+    stayEmphasis: 'Your own place.',
+    stayIntro:
+      'A whole villa to share. A private pool, jacuzzi and garden to make the days your own.',
+    stats: ['Guests, up to', 'Bedrooms', 'Beds', 'Bathroom'],
+    details: 'Everything included',
+    experienceLead: 'Days outside.',
+    experienceEmphasis: 'Time together.',
+    experienceIntro:
+      'A swim. A slow afternoon. One more evening under the trees.',
+    moments: [
+      'Private pool',
+      'Jacuzzi',
+      'The warmth of the sauna',
+      'Evenings outside',
+    ],
+    finalLead: 'Close to the city.',
+    finalEmphasis: 'Away from the everyday.',
+    journey: 'Approx. 25 minutes by car',
+    directions: 'Get directions',
+    contact: 'Contact Villa Ada',
+  },
   metadata: {
     title: 'Villa Ada | Private Villa 25 Minutes from Prishtina',
     description:
@@ -273,6 +308,40 @@ type DeepWiden<T> = T extends string
 export type Dictionary = DeepWiden<typeof en>;
 
 const sq: Dictionary = {
+  editorial: {
+    home: 'Ballina',
+    stay: 'Qëndrimi',
+    experience: 'Përjetimi',
+    location: 'Na gjeni',
+    escape: 'Një arratisje private',
+    near: 'pranë Prishtinës.',
+    distance: 'Rreth 25 min nga Prishtina',
+    explore: 'Zbuloni vilën',
+    reserve: 'Planifikoni qëndrimin',
+    film: 'Një vështrim në Villa Ada',
+    pause: 'Ndaloni videon',
+    play: 'Luani videon',
+    stayLead: 'Njerëzit tuaj.',
+    stayEmphasis: 'Hapësira juaj.',
+    stayIntro:
+      'Një vilë e tërë për ju. Pishinë private, xhakuzi dhe kopsht për t’i shijuar ditët siç dëshironi.',
+    stats: ['Mysafirë, deri në', 'Dhoma gjumi', 'Shtretër', 'Banjo'],
+    details: 'Gjithçka e përfshirë',
+    experienceLead: 'Ditë jashtë.',
+    experienceEmphasis: 'Kohë së bashku.',
+    experienceIntro: 'Një not. Një pasdite e qetë. Edhe një mbrëmje nën pemë.',
+    moments: [
+      'Pishinë private',
+      'Xhakuzi',
+      'Ngrohtësia e saunës',
+      'Mbrëmje jashtë',
+    ],
+    finalLead: 'Pranë qytetit.',
+    finalEmphasis: 'Larg përditshmërisë.',
+    journey: 'Rreth 25 minuta me makinë',
+    directions: 'Shikoni udhëzimet',
+    contact: 'Kontaktoni Villa Ada',
+  },
   metadata: {
     title: 'Villa Ada | Vilë private 25 minuta nga Prishtina',
     description:
