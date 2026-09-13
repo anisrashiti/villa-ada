@@ -1,12 +1,19 @@
-import { ArrowDown, ArrowUpRight, ChevronDown } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUpRight,
+  ChevronDown,
+  MessageCircle,
+  Phone,
+} from 'lucide-react';
 import Image from 'next/image';
+import { FaFacebookF, FaInstagram, FaTiktok } from 'react-icons/fa6';
 import { BookingCta } from '@/components/booking-cta';
 import { Gallery } from '@/components/gallery';
 import { HeroFilm } from '@/components/hero-film';
 import { PropertyImage } from '@/components/property-image';
 import { ScrollReveal } from '@/components/scroll-reveal';
 import { SiteHeader } from '@/components/site-header';
-import { property } from '@/src/config/property';
+import { property, socialLinks } from '@/src/config/property';
 import {
   dictionaries,
   localePaths,
@@ -28,6 +35,51 @@ function SectionLabel({
   );
 }
 
+const socialPlatforms = [
+  { platform: 'instagram', label: 'Instagram', Icon: FaInstagram },
+  { platform: 'facebook', label: 'Facebook', Icon: FaFacebookF },
+  { platform: 'tiktok', label: 'TikTok', Icon: FaTiktok },
+] as const;
+
+const activeSocialLinks = socialPlatforms.flatMap(
+  ({ platform, label, Icon }) => {
+    const url = socialLinks[platform];
+    return url ? [{ platform, label, Icon, url }] : [];
+  },
+);
+
+function SocialIconLinks({
+  label,
+  opensNewTab,
+  className = '',
+  showLabels = false,
+}: {
+  label: string;
+  opensNewTab: string;
+  className?: string;
+  showLabels?: boolean;
+}) {
+  if (activeSocialLinks.length === 0) return null;
+
+  return (
+    <nav className={`social-icon-links ${className}`} aria-label={label}>
+      {activeSocialLinks.map(({ platform, label: platformLabel, Icon, url }) => (
+        <a
+          key={platform}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${platformLabel}${opensNewTab}`}
+          title={platformLabel}
+        >
+          <Icon aria-hidden="true" focusable="false" />
+          {showLabels && <span>{platformLabel}</span>}
+        </a>
+      ))}
+    </nav>
+  );
+}
+
 export function VillaPage({ locale }: { locale: Locale }) {
   const copy = dictionaries[locale];
   const e = copy.editorial;
@@ -46,6 +98,8 @@ export function VillaPage({ locale }: { locale: Locale }) {
     image: new URL('/images/optimized/hero-pool-01-1600.webp', property.siteUrl)
       .href,
     numberOfRooms: property.capacity.bedrooms,
+    telephone: property.contact.phone,
+    hasMap: property.location.mapsUrl,
     amenityFeature: copy.amenities.groups.flatMap((group) =>
       group.items.map((name) => ({
         '@type': 'LocationFeatureSpecification',
@@ -211,24 +265,59 @@ export function VillaPage({ locale }: { locale: Locale }) {
               <p>{e.journey}</p>
             </div>
             {property.location.address && <p>{property.location.address}</p>}
-            {property.location.mapsUrl && (
-              <a
-                className="text-link"
-                href={property.location.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {e.directions}
-                <ArrowUpRight size={18} aria-hidden="true" />
-              </a>
-            )}
-            <div className="destination-booking">
-              <BookingCta copy={copy.booking} />
-              {property.contact.phone && (
-                <a className="text-link" href={'tel:' + property.contact.phone}>
-                  {property.contact.phone}
+            <div className="location-map-block" data-reveal>
+              <div className="location-map-heading">
+                <h3>{copy.location.mapLabel}</h3>
+                <a
+                  className="text-link"
+                  href={property.location.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {copy.location.openInMaps}
+                  <ArrowUpRight size={18} aria-hidden="true" />
+                  <span className="sr-only">{copy.booking.opensNewTab}</span>
                 </a>
-              )}
+              </div>
+              <div className="destination-map">
+                <iframe
+                  src={property.location.embedUrl}
+                  title={copy.location.mapTitle}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+            <div className="destination-booking">
+              <p className="contact-heading">{e.contact}</p>
+              <BookingCta copy={copy.booking} />
+              <div className="contact-options">
+                <a className="contact-option" href={property.contact.phoneHref}>
+                  <Phone size={18} strokeWidth={1.6} aria-hidden="true" />
+                  <span>
+                    <small>{copy.contact.phone}</small>
+                    <strong>{property.contact.phone}</strong>
+                  </span>
+                </a>
+                <a
+                  className="contact-option"
+                  href={property.contact.whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageCircle
+                    size={18}
+                    strokeWidth={1.6}
+                    aria-hidden="true"
+                  />
+                  <span>
+                    <small>{copy.contact.whatsapp}</small>
+                    <strong>{property.contact.phone}</strong>
+                  </span>
+                  <span className="sr-only">{copy.booking.opensNewTab}</span>
+                </a>
+              </div>
               {property.contact.email && (
                 <a
                   className="text-link"
@@ -236,6 +325,18 @@ export function VillaPage({ locale }: { locale: Locale }) {
                 >
                   {property.contact.email}
                 </a>
+              )}
+              {activeSocialLinks.length > 0 && (
+                <div className="contact-socials">
+                  <h3>{copy.contact.follow}</h3>
+                  <p>{copy.contact.followDescription}</p>
+                  <SocialIconLinks
+                    className="contact-social-buttons"
+                    showLabels
+                    label={copy.contact.social}
+                    opensNewTab={copy.booking.opensNewTab}
+                  />
+                </div>
               )}
             </div>
           </div>
@@ -250,11 +351,20 @@ export function VillaPage({ locale }: { locale: Locale }) {
           <Image src={property.logo} alt="" width={40} height={40} />
           <span>Villa Ada</span>
         </a>
-        <span>© {new Date().getFullYear()} Villa Ada</span>
-        <a className="text-link" href="#top">
-          {copy.footer.backToTop}
-          <ArrowUpRight size={18} aria-hidden="true" />
-        </a>
+        <span className="footer-copyright">
+          © {new Date().getFullYear()} Villa Ada
+        </span>
+        <div className="footer-actions">
+          <SocialIconLinks
+            className="footer-socials"
+            label={copy.contact.social}
+            opensNewTab={copy.booking.opensNewTab}
+          />
+          <a className="text-link" href="#top">
+            {copy.footer.backToTop}
+            <ArrowUpRight size={18} aria-hidden="true" />
+          </a>
+        </div>
       </footer>
       <ScrollReveal />
       <script

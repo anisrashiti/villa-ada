@@ -49,6 +49,17 @@ function LanguageSwitcher({
     <fieldset className="language-switcher">
       <legend className="sr-only">{label}</legend>
       <Link
+        href={localePaths.sq}
+        hrefLang="sq"
+        lang="sq"
+        className={locale === 'sq' ? 'is-active' : undefined}
+        aria-current={locale === 'sq' ? 'page' : undefined}
+        onClick={onClick}
+      >
+        AL
+      </Link>
+      <span aria-hidden="true">/</span>
+      <Link
         href={localePaths.en}
         hrefLang="en"
         lang="en"
@@ -57,17 +68,6 @@ function LanguageSwitcher({
         onClick={onClick}
       >
         EN
-      </Link>
-      <span aria-hidden="true">/</span>
-      <Link
-        href={localePaths.sq}
-        hrefLang="sq"
-        lang="sq"
-        className={locale === 'sq' ? 'is-active' : undefined}
-        aria-current={locale === 'sq' ? 'page' : undefined}
-        onClick={onClick}
-      >
-        SQ
       </Link>
     </fieldset>
   );

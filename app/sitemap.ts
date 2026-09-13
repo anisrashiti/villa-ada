@@ -10,13 +10,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      url: languages.en,
+      url: languages.sq,
       changeFrequency: 'monthly',
       priority: 1,
       alternates: { languages },
     },
     {
-      url: languages.sq,
+      url: languages.en,
       changeFrequency: 'monthly',
       priority: 1,
       alternates: { languages },

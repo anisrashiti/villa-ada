@@ -69,6 +69,13 @@ const en = {
     viewOnAirbnb: 'View on Airbnb',
     opensNewTab: ' (opens in a new tab)',
   },
+  contact: {
+    phone: 'Phone',
+    whatsapp: 'WhatsApp',
+    social: 'Social media',
+    follow: 'Follow Villa Ada',
+    followDescription: 'See moments, videos and updates from Villa Ada.',
+  },
   hero: {
     kicker: 'A private retreat · 25 minutes from Prishtina',
     heading: { lead: 'A slower', emphasis: 'kind of stay.' },
@@ -233,6 +240,9 @@ const en = {
     ],
   },
   location: {
+    mapLabel: 'Location',
+    openInMaps: 'Open in Google Maps',
+    mapTitle: 'Interactive map showing the Villa Ada location',
     short: '25 minutes from Prishtina',
     byline: 'An easy drive. A different pace.',
     label: 'Near, yet away',
@@ -324,7 +334,7 @@ const sq: Dictionary = {
     stayLead: 'Njerëzit tuaj.',
     stayEmphasis: 'Hapësira juaj.',
     stayIntro:
-      'Një vilë e tërë për ju. Pishinë private, xhakuzi dhe kopsht për t’i shijuar ditët siç dëshironi.',
+      'Një vilë e tërë për ju. Pishinë private, saunë, xhakuzi dhe kopsht për t’i shijuar ditët siç dëshironi.',
     stats: ['Mysafirë, deri në', 'Dhoma gjumi', 'Shtretër', 'Banjo'],
     details: 'Gjithçka e përfshirë',
     experienceLead: 'Ditë jashtë.',
@@ -375,6 +385,13 @@ const sq: Dictionary = {
     comingSoonCompact: 'Së shpejti në Airbnb',
     viewOnAirbnb: 'Shikoni në Airbnb',
     opensNewTab: ' (hapet në një skedë të re)',
+  },
+  contact: {
+    phone: 'Telefoni',
+    whatsapp: 'WhatsApp',
+    social: 'Rrjetet sociale',
+    follow: 'Ndiqni Villa Ada',
+    followDescription: 'Shihni momente, video dhe përditësime nga Villa Ada.',
   },
   hero: {
     kicker: 'Një strehë private · 25 minuta nga Prishtina',
@@ -458,10 +475,10 @@ const sq: Dictionary = {
     label: 'Brenda Villa Ada',
     heading: { lead: 'Hyni brenda.', emphasis: 'Ndihuni si në shtëpi.' },
     description:
-      'Oxhaku, tullat e ekspozuara dhe trarët prej druri i japin sallonit një atmosferë të ngrohtë e të çlirët. Kuzhina e pajisur plotësisht dhe hapësira e ngrënies i mbajnë të gjithë pranë mes ditëve të kaluara jashtë.',
+      'Oxhaku, tullat e ekspozuara dhe trarët prej druri i japin sallonit një atmosferë të ngrohtë e të çlirët. Kuzhina e pajisur plotësisht dhe hapësira e ushqimit i mbajnë të gjithë pranë mes ditëve të kaluara jashtë.',
     imageCaption: 'Trarë druri, tulla të ngrohta, hapësirë për të gjithë.',
     features: ['Oxhak', 'Wi-Fi', 'Kuzhinë e kompletuar'],
-    sleepingTitle: 'Hapësirë për deri në 10 veta',
+    sleepingTitle: 'Hapësirë për deri në 10 persona',
     sleeping: [
       { space: 'Dhoma e parë', guests: '4 mysafirë' },
       { space: 'Dhoma e dytë', guests: '2 mysafirë' },
@@ -512,9 +529,9 @@ const sq: Dictionary = {
           'Kopsht privat',
           'Skarë',
           'Sallon i jashtëm i mbuluar',
-          'Ulëse dhe hapësirë ngrënieje jashtë',
-          'Shezlongë',
-          'Hamak',
+          'Ulëse dhe hapësirë ushqimi jashtë',
+          'Shezllonë',
+          'Shtrat i varur',
         ],
       },
       {
@@ -524,7 +541,7 @@ const sq: Dictionary = {
           'Klimatizim',
           'Wi-Fi',
           'Sallon i madh',
-          'Hapësirë ngrënieje brenda',
+          'Hapësirë ushqimi brenda',
         ],
       },
       {
@@ -544,6 +561,9 @@ const sq: Dictionary = {
     ],
   },
   location: {
+    mapLabel: 'Lokacioni',
+    openInMaps: 'Hape në Google Maps',
+    mapTitle: 'Hartë interaktive që tregon lokacionin e Villa Ada',
     short: '25 minuta nga Prishtina',
     byline: 'Një udhëtim i lehtë. Një ritëm tjetër.',
     label: 'Afër, por larg',
@@ -583,11 +603,11 @@ const sq: Dictionary = {
     poolside:
       'Sallon i mbuluar pranë pishinës me dru natyral dhe ulëse të rehatshme',
     lounge: 'Sallon i bollshëm dhe i mbuluar jashtë Villa Ada',
-    grill: 'Skarë me tulla dhe hapësirë ngrënieje nën strehën prej druri',
+    grill: 'Skarë me tulla dhe hapësirë ushqimi nën strehën prej druri',
     living:
       'Salloni i madh i Villa Ada me oxhak, trarë druri dhe pamje nga kopshti',
     bedroomFour: 'Dhoma e parë me hapësirë fjetjeje për katër mysafirë',
-    kitchen: 'Kuzhina e pajisur plotësisht dhe tryeza e ngrënies brenda',
+    kitchen: 'Kuzhina e pajisur plotësisht dhe tryeza e ushqimit brenda',
     bathroom: 'Banjo e plotë me dush pa prag dhe ndarje xhami',
     gallery: [
       'Pishina private dhe kopshti në Villa Ada',
@@ -610,7 +630,7 @@ const sq: Dictionary = {
 
 export const dictionaries: Record<Locale, Dictionary> = { en, sq };
 
-export const localePaths: Record<Locale, '/' | '/sq'> = {
-  en: '/',
-  sq: '/sq',
+export const localePaths: Record<Locale, '/' | '/en'> = {
+  en: '/en',
+  sq: '/',
 };

@@ -15,7 +15,7 @@ export function createMetadata(locale: Locale): Metadata {
       languages: {
         en: localePaths.en,
         sq: localePaths.sq,
-        'x-default': localePaths.en,
+        'x-default': localePaths.sq,
       },
     },
     icons: { icon: property.logo, apple: property.logo },

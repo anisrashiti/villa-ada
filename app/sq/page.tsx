@@ -1,5 +1,5 @@
-import { VillaPage } from '@/components/villa-page';
+import { permanentRedirect } from 'next/navigation';
 
-export default function AlbanianHome() {
-  return <VillaPage locale="sq" />;
+export default function LegacyAlbanianHome() {
+  permanentRedirect('/');
 }

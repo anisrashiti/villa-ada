@@ -5,7 +5,12 @@ export const property = {
   airbnbUrl: '',
   video: '/video/villa-ada-hero.mp4',
   videoPoster: '/video/villa-ada-poster.webp',
-  location: { address: '', mapsUrl: '' },
+  location: {
+    address: '',
+    mapsUrl: 'https://maps.app.goo.gl/N1krcTrH2McjXhyw7',
+    embedUrl:
+      'https://www.google.com/maps?q=42.8010278,21.2371389&z=15&output=embed',
+  },
   capacity: {
     guests: 10,
     bedrooms: 2,
@@ -15,7 +20,9 @@ export const property = {
   },
   contact: {
     email: '',
-    phone: '',
+    phone: '+383 44 545 434',
+    phoneHref: 'tel:+38344545434',
+    whatsappUrl: 'https://wa.me/38344545434',
   },
   images: {
     hero: '/images/hero-pool-01.jpeg',
@@ -43,6 +50,15 @@ export const property = {
     '/images/bathroom-01.jpeg',
     '/images/entrance-01.jpeg',
   ],
+} as const;
+
+export const socialLinks = {
+  // Official Villa Ada Instagram profile.
+  instagram: 'https://www.instagram.com/villaada__/',
+  // Official Villa Ada Facebook profile.
+  facebook: 'https://www.facebook.com/profile.php?id=61591542504363',
+  // Official Villa Ada TikTok profile.
+  tiktok: 'https://www.tiktok.com/@villaada_',
 } as const;
 
 export type Property = typeof property;
